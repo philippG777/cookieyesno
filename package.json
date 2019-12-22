@@ -1,5 +1,6 @@
 {
     "name": "cookieyesno",
+    "version": "1.0.0",
     "main": "src/cookieyesno.js",
     "repository": {
         "type": "git",
