@@ -105,7 +105,7 @@ export default class CookieYesNo {
 
         // Cookie Policy link
         text += '<p>For detailed information take a look at the <a href="' + this._config.cookiePolicy +
-            '">Privacy Policy</a>.</p>';
+            '">Cookie Policy</a>.</p>';
 
         text += '<button class="cyn-btn-save">Save Settings</button>';
         text += '<button class="cyn-btn-accept-all">Accept all</button>';
