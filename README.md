@@ -4,6 +4,8 @@ Easy to use GDPR-complient cookie-banner
 ## Usage
 
 ```js
+import CookieYesNo from 'cookieyesno';
+
 const cyn = new CookieYesNo({
 	text: 'This website uses cookies. You can select below which cookies will be stored on your device.',
     cookiePolicy: '<LINK TO YOUR COOKIE POLICY>',
