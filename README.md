@@ -1,10 +1,16 @@
 # cookieyesno
 Easy to use GDPR-complient cookie-banner
 
+Take a look at it in action on a real site: https://watchaccuracy.com/
+
 ## Usage
 
+
 ```js
+// using packages
 import CookieYesNo from 'cookieyesno';
+
+// or simply include the dist/cookieyesno.min.js file in the html
 
 const cyn = new CookieYesNo({
 	text: 'This website uses cookies. You can select below which cookies will be stored on your device.',
@@ -40,3 +46,12 @@ cyn.getSettings(); // example-response { required: true, analytics: false }
 
 cyn.reviewSettings();       // open the banner to let the user review the settings
 ```
+
+## Modify the banner
+It's pretty simple: just use CSS-rules.
+The following classes are available:
+
+* `.cyn-banner`: main banner element
+* `.cyn-categories`: table containing the different cookie categories
+* `.cyn-btn-save`: save settings button 
+* `.cyn-btn-accept-all`: accept all button
