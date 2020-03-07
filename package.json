@@ -1,6 +1,6 @@
 {
     "name": "cookieyesno",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "main": "src/cookieyesno.js",
     "scripts": {
         "build": "python3 compile.py"
@@ -9,5 +9,6 @@
         "type": "git",
         "url": "https://github.com/philippG777/cookieyesno.git"
     },
-    "license": "BSD 3-Clause"
+    "license": "BSD 3-Clause",
+    "keywords": ["cookie", "cookies", "browser", "banner", "privacy", "policy", "consent", "legal"]
 }
