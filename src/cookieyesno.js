@@ -1,10 +1,10 @@
 'use strict';
 
 /*!
-CookieYesNo | philippG777 | https://github.com/philippG777/cookieyesno | BSD 3-Clause License
+CookieYesNo | philippG777 | https://github.com/philippG777/cookieyesno | MIT License
 */
 
-class CookieYesNo {
+export default class CookieYesNo {
     constructor(config) {
         this.cookie = {     //  cookie handler
             set: function(cname, data) {
@@ -228,5 +228,3 @@ class CookieYesNo {
     show() { this.banner.style.display = 'block' }
     hide() { this.banner.style.display = 'none' }
 };
-
-module.exports = CookieYesNo;
