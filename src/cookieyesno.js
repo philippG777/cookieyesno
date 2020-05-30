@@ -10,7 +10,7 @@ export default class CookieYesNo {
             set: function(cname, data) {
                 let d = new Date();
                 d.setTime(d.getTime() + 90 * 86400000);      // 90 days
-                document.cookie = cname + '=' + data + ';expires=' + d.toUTCString() + ';path=/';
+                document.cookie = cname + '=' + data + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
             },
             get: function(cname) {
                 const parts = document.cookie.split(';');
