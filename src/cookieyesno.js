@@ -6,20 +6,24 @@ CookieYesNo | philippG777 | https://github.com/philippG777/cookieyesno | MIT Lic
 
 export default class CookieYesNo {
     constructor(config) {
+        this.version = '1.0.4';
         this.cookie = {     //  cookie handler
-            set: function(cname, data) {
+            set: function(data) {
                 let d = new Date();
                 d.setTime(d.getTime() + 90 * 86400000);      // 90 days
-                document.cookie = cname + '=' + data + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
+                document.cookie = '_cyn=' + data + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
             },
-            get: function(cname) {
+            get: function() {
                 const parts = document.cookie.split(';');
 
                 for(let i = 0; i < parts.length; i++) {
                     const pair = parts[i].trim().split('=');
-                    if(pair[0] == cname) return pair[1];
+                    if(pair[0] == '_cyn') return pair[1];
                 }
                 return null;
+            },
+            clear: function() {
+                document.cookie = '_cyn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;SameSite=Lax';
             }
         };
 
@@ -34,19 +38,36 @@ export default class CookieYesNo {
         this._applyStyle();
         this._addListeners();
 
-        if(this._load() == null)
+        const storedData = this._load()
+
+        if(storedData == null)
             this.show();
+        else if(storedData['version'] != this.version) {
+            // lib has been updated - get consent again to ensure data integrity
+            this.cookie.clear()
+            this.show();
+        }
         else
             this._runAcceptRejectListeners();
     }
 
     _load() {
-        const data = this.cookie.get('_cyn');
+        const data = this.cookie.get();
         return (data == null)? null : JSON.parse(data);
     }
 
     _save(settings) {
-        this.cookie.set('_cyn', JSON.stringify(settings));
+        const data = {
+            version: this.version,
+            settings: settings
+        };
+        this.cookie.set(JSON.stringify(data));
+    }
+
+    getSettings() {
+        const data = this._load();
+        if(data == null) return {};
+        else return data['settings'];
     }
 
     onChange(cb) {
@@ -71,12 +92,6 @@ export default class CookieYesNo {
                 name: name,
                 cb: cb
             });
-    }
-
-    getSettings() {
-        const settings = this._load();
-        if(settings == null) return {};
-        else return settings;
     }
 
     reviewSettings() {
