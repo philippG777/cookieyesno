@@ -102,14 +102,20 @@ export default class CookieYesNo {
     _createBanner() {
         const el = document.createElement('div');
         el.className = 'cyn-banner';
-        let text = '<h3 style="font-size: 28px; font-weight: bold;">This site uses cookies</h3>';
+        let text = '<h3 style="font-size:28px;font-weight:bold;margin-top:16px;margin-bottom:20px">Cookie Settings</h3>';
         text += '<p>' + this._config.text + '</p>';
+
+
+        // buttons
+        text += '<button class="cyn-btn-accept-all">Accept all cookies</button>';
+        text += '<button class="cyn-btn-save">Allow selection</button>';
+
         text += '<table class="cyn-categories"><tbody>';
 
         for(const key in this._config.categories) {
             const cat = this._config.categories[key];
 
-            text += '<tr><td style="font-weight:bold;">' + key + '</td><td>' + cat.description + '</td><td>';
+            text += '<tr><td style="font-weight:bold">' + key + '</td><td>' + cat.description + '</td><td>';
             text += '<input type="checkbox" value="' + key + '"'
                  + ((cat.allowed)? ' checked' : '')
                  + ((cat.changeable === true || cat.changeable === undefined)? '' : ' disabled') + '/>';
@@ -121,9 +127,6 @@ export default class CookieYesNo {
         // Cookie Policy link
         text += '<p>For detailed information take a look at the <a href="' + this._config.cookiePolicy.url +
             '">' + this._config.cookiePolicy.text + '</a>.</p>';
-
-        text += '<button class="cyn-btn-save">Allow selection</button>';
-        text += '<button class="cyn-btn-accept-all">Accept all</button>';
 
         // section for other links
         text += '<div class="cyn-other-links" style="padding-top: 16px; padding-bottom: 10px">';
@@ -162,6 +165,11 @@ export default class CookieYesNo {
         style.padding = '16px';
         style.boxShadow = '0 0 24px #aaa';
         style.borderRadius = '8px';
+
+        style.fontSize = '14px';
+        style.fontFamily = '"Trebuchet MS", Helvetica, sans-serif';
+        style.color = '#444';
+
         style.overflowY = 'auto';
         
         if(window.innerWidth <= 768)    // mobile
@@ -189,26 +197,22 @@ export default class CookieYesNo {
             
             style.boxSizing = 'border-box';
             style.cursor = 'pointer';
-            style.margin = '8px';
-            style.marginTop = '12px';
+            style.margin = '12px';
+            style.marginLeft = '10%';
             style.borderRadius = '4px';
-
-            if(buttons[i].className == 'cyn-btn-accept-all') {
-                style.border = '0px';
-                style.backgroundColor = '#48c774';
-                style.color = 'white';
-                style.fontWeight = 'bold';
-                style.fontSize = '24px';
-                style.padding = '12px';
-                style.paddingLeft = style.paddingRight = '16px';
-            } else {
-                style.backgroundColor = 'white';
-                style.color = '#999';
-                style.border = '2px solid #bbb';
-                style.fontSize = '20px';
-                style.padding = '8px';
-            }
+            style.border = '0px';
+            style.backgroundColor = '#48c774';
+            style.color = 'white';
+            style.fontSize = '18px';
+            style.padding = '8px';
+            style.paddingLeft = style.paddingRight = '12px';
+            style.display = 'block';
         }
+
+        // links
+        const aElems = this.banner.getElementsByTagName('a');
+        for(let i = 0; i < aElems.length; i++)
+            aElems[i].style.color = '#333';
     }
 
     _addListeners() {
