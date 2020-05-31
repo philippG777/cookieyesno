@@ -12,8 +12,12 @@ import CookieYesNo from 'cookieyesno';
 // or simply include the dist/cookieyesno.min.js file in the html
 
 const cyn = new CookieYesNo({
-	text: 'This website uses cookies. You can select below which cookies will be stored on your device.',
-    cookiePolicy: '<LINK TO YOUR COOKIE POLICY>',
+    text: 'This website uses cookies. You can select below which cookies will be \
+    stored on your device or use the "Accept all cookies" button to allow the usage of all.',
+    cookiePolicy: {
+        url: '<LINK TO YOUR COOKIE POLICY>',
+        text: 'Cookie Policy'
+    },
     categories: {                   // different categories of cookies
         required: {
             allowed: true,          // preselected
