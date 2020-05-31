@@ -1,6 +1,6 @@
 {
   "name": "cookieyesno",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "dist/cookieyesno.cjs.js",
   "module": "src/cookieyesno.js",
   "browser": "dist/cookieyesno.min.js",
