@@ -5,7 +5,6 @@ Take a look at it in action on a real site: https://watchaccuracy.com/
 
 ## Usage
 
-
 ```js
 // using packages
 import CookieYesNo from 'cookieyesno';
@@ -46,6 +45,20 @@ cyn.getSettings(); // example-response { required: true, analytics: false }
 
 cyn.reviewSettings();       // open the banner to let the user review the settings
 ```
+
+## Configuration
+* `text`: Text of the banner (String)
+* `cookiePolicy`: (Object)
+    * `url`: URL of your cookie policy (String)
+    * `text`: Text of the link
+* `categories`: Array of Objects - take a look at the example
+* `imprint`: (Object)
+    * `url`: URL of your imprint (required in case that the banner covers the link on the actual page)
+    * `text`: Text of the link
+* `privacyPolicy`: (Object)
+    * `url`: URL of your privacy policy (in case the banner covers the link on the actual page)
+    * `text`: Text of the link
+* `version`: Version of the configuration - if you change the version - the user has to consent again (for the case that you change something in the categories) - Use any text you like to, I recommed the date of the change
 
 ## Modify the banner
 It's pretty simple: just use CSS-rules.
