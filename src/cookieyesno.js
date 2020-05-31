@@ -42,8 +42,9 @@ export default class CookieYesNo {
 
         if(storedData == null)
             this.show();
-        else if(storedData['version'] != this.version) {
-            // lib has been updated - get consent again to ensure data integrity
+        else if(storedData['version'] != this.version || // lib has been updated - get consent again to ensure its valid
+            this._config.version != undefined && this._config.version != storedData['configversion'])
+            {
             this.cookie.clear()
             this.show();
         }
@@ -61,6 +62,10 @@ export default class CookieYesNo {
             version: this.version,
             settings: settings
         };
+
+        if(this._config.version != undefined)
+            data.configversion = this._config.version;
+
         this.cookie.set(JSON.stringify(data));
     }
 
@@ -129,7 +134,7 @@ export default class CookieYesNo {
             '">' + this._config.cookiePolicy.text + '</a>.</p>';
 
         // section for other links
-        text += '<div class="cyn-other-links" style="padding-top: 16px; padding-bottom: 10px">';
+        text += '<div class="cyn-other-links" style="padding-top:6px;padding-bottom:8px;font-size:12px">';
 
         if(this._config.imprint != undefined)
             text += '<a href="' + this._config.imprint.url + '">' + this._config.imprint.text + '</a> ';
