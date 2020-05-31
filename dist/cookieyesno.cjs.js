@@ -6,20 +6,24 @@ CookieYesNo | philippG777 | https://github.com/philippG777/cookieyesno | MIT Lic
 
 class CookieYesNo {
     constructor(config) {
+        this.version = '1.0.4';
         this.cookie = {     //  cookie handler
-            set: function(cname, data) {
+            set: function(data) {
                 let d = new Date();
                 d.setTime(d.getTime() + 90 * 86400000);      // 90 days
-                document.cookie = cname + '=' + data + ';expires=' + d.toUTCString() + ';path=/';
+                document.cookie = '_cyn=' + data + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
             },
-            get: function(cname) {
+            get: function() {
                 const parts = document.cookie.split(';');
 
                 for(let i = 0; i < parts.length; i++) {
                     const pair = parts[i].trim().split('=');
-                    if(pair[0] == cname) return pair[1];
+                    if(pair[0] == '_cyn') return pair[1];
                 }
                 return null;
+            },
+            clear: function() {
+                document.cookie = '_cyn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;SameSite=Lax';
             }
         };
 
@@ -34,19 +38,41 @@ class CookieYesNo {
         this._applyStyle();
         this._addListeners();
 
-        if(this._load() == null)
+        const storedData = this._load();
+
+        if(storedData == null)
             this.show();
+        else if(storedData['version'] != this.version || // lib has been updated - get consent again to ensure its valid
+            this._config.version != undefined && this._config.version != storedData['configversion'])
+            {
+            this.cookie.clear();
+            this.show();
+        }
         else
             this._runAcceptRejectListeners();
     }
 
     _load() {
-        const data = this.cookie.get('_cyn');
+        const data = this.cookie.get();
         return (data == null)? null : JSON.parse(data);
     }
 
     _save(settings) {
-        this.cookie.set('_cyn', JSON.stringify(settings));
+        const data = {
+            version: this.version,
+            settings: settings
+        };
+
+        if(this._config.version != undefined)
+            data.configversion = this._config.version;
+
+        this.cookie.set(JSON.stringify(data));
+    }
+
+    getSettings() {
+        const data = this._load();
+        if(data == null) return {};
+        else return data['settings'];
     }
 
     onChange(cb) {
@@ -56,27 +82,21 @@ class CookieYesNo {
     onAccept(name, cb) {
         if((this.getSettings())[name] === true)
             cb();
-        else
-            this._acceptListeners.push({
-                name: name,
-                cb: cb
-            });
+
+        this._acceptListeners.push({
+            name: name,
+            cb: cb
+        });
     }
 
     onReject(name, cb) {
         if((this.getSettings())[name] === false)
             cb();
-        else
-            this._rejectListeners.push({
-                name: name,
-                cb: cb
-            });
-    }
 
-    getSettings() {
-        const settings = this._load();
-        if(settings == null) return {};
-        else return settings;
+        this._rejectListeners.push({
+            name: name,
+            cb: cb
+        });
     }
 
     reviewSettings() {
@@ -87,14 +107,20 @@ class CookieYesNo {
     _createBanner() {
         const el = document.createElement('div');
         el.className = 'cyn-banner';
-        let text = '<h3 style="font-size: 28px; font-weight: bold;">This site uses cookies</h3>';
+        let text = '<h3 style="font-size:28px;font-weight:bold;margin-top:16px;margin-bottom:20px">Cookie Settings</h3>';
         text += '<p>' + this._config.text + '</p>';
+
+
+        // buttons
+        text += '<button class="cyn-btn-accept-all">Accept all cookies</button>';
+        text += '<button class="cyn-btn-save">Accept selection</button>';
+
         text += '<table class="cyn-categories"><tbody>';
 
         for(const key in this._config.categories) {
             const cat = this._config.categories[key];
 
-            text += '<tr><td style="font-weight:bold;">' + key + '</td><td>' + cat.description + '</td><td>';
+            text += '<tr><td style="font-weight:bold">' + key + '</td><td>' + cat.description + '</td><td>';
             text += '<input type="checkbox" value="' + key + '"'
                  + ((cat.allowed)? ' checked' : '')
                  + ((cat.changeable === true || cat.changeable === undefined)? '' : ' disabled') + '/>';
@@ -104,11 +130,18 @@ class CookieYesNo {
         text += '</tbody></table>';
 
         // Cookie Policy link
-        text += '<p>For detailed information take a look at the <a href="' + this._config.cookiePolicy +
-            '">Cookie Policy</a>.</p>';
+        text += '<p>For detailed information take a look at the <a href="' + this._config.cookiePolicy.url +
+            '">' + this._config.cookiePolicy.text + '</a>.</p>';
 
-        text += '<button class="cyn-btn-save">Save Settings</button>';
-        text += '<button class="cyn-btn-accept-all">Accept all</button>';
+        // section for other links
+        text += '<div class="cyn-other-links" style="padding-top:6px;padding-bottom:8px;font-size:12px">';
+
+        if(this._config.imprint != undefined)
+            text += '<a href="' + this._config.imprint.url + '">' + this._config.imprint.text + '</a> ';
+        if(this._config.privacyPolicy != undefined)
+            text += '<a href="' + this._config.privacyPolicy.url + '">' + this._config.privacyPolicy.text + '</a> ';
+
+        text += '</div>';
 
         el.innerHTML = text;
         el.style.display = 'none';
@@ -137,11 +170,21 @@ class CookieYesNo {
         style.padding = '16px';
         style.boxShadow = '0 0 24px #aaa';
         style.borderRadius = '8px';
+
+        style.fontSize = '14px';
+        style.fontFamily = '"Trebuchet MS", Helvetica, sans-serif';
+        style.color = '#444';
+
+        style.overflowY = 'auto';
         
         if(window.innerWidth <= 768)    // mobile
-            style.right = style.left = style.bottom = '16px';
+            style.top = style.right = style.left = style.bottom = '16px';
         else        // desktop (large screen)
+        {
             style.right = style.bottom = '32px';
+            style.maxHeight = '80vh';
+        }
+            
 
         // table
         style = this.banner.getElementsByTagName('table')[0].style;
@@ -159,26 +202,22 @@ class CookieYesNo {
             
             style.boxSizing = 'border-box';
             style.cursor = 'pointer';
-            style.margin = '8px';
-            style.marginTop = '24px';
+            style.margin = '12px';
+            style.marginLeft = '10%';
             style.borderRadius = '4px';
-
-            if(buttons[i].className == 'cyn-btn-accept-all') {
-                style.border = '0px';
-                style.backgroundColor = '#48c774';
-                style.color = 'white';
-                style.fontWeight = 'bold';
-                style.fontSize = '24px';
-                style.padding = '12px';
-                style.paddingLeft = style.paddingRight = '16px';
-            } else {
-                style.backgroundColor = 'white';
-                style.color = '#999';
-                style.border = '2px solid #bbb';
-                style.fontSize = '20px';
-                style.padding = '8px';
-            }
+            style.border = '0px';
+            style.backgroundColor = '#48c774';
+            style.color = 'white';
+            style.fontSize = '18px';
+            style.padding = '8px';
+            style.paddingLeft = style.paddingRight = '12px';
+            style.display = 'block';
         }
+
+        // links
+        const aElems = this.banner.getElementsByTagName('a');
+        for(let i = 0; i < aElems.length; i++)
+            aElems[i].style.color = '#333';
     }
 
     _addListeners() {
