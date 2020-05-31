@@ -122,7 +122,7 @@ export default class CookieYesNo {
         text += '<p>For detailed information take a look at the <a href="' + this._config.cookiePolicy.url +
             '">' + this._config.cookiePolicy.text + '</a>.</p>';
 
-        text += '<button class="cyn-btn-save">Save Settings</button>';
+        text += '<button class="cyn-btn-save">Allow selection</button>';
         text += '<button class="cyn-btn-accept-all">Accept all</button>';
 
         // section for other links
@@ -190,7 +190,7 @@ export default class CookieYesNo {
             style.boxSizing = 'border-box';
             style.cursor = 'pointer';
             style.margin = '8px';
-            style.marginTop = '24px';
+            style.marginTop = '12px';
             style.borderRadius = '4px';
 
             if(buttons[i].className == 'cyn-btn-accept-all') {
