@@ -5,7 +5,7 @@ export function log(message) {
 };
 
 export function showCookieSettings(cyn) {
-    const settings = JSON.stringify(cyn.getSettings(), null, 2);
+    const settings = JSON.stringify(cyn._load(), null, 2);
     document.getElementById('settings').innerHTML = settings;
 };
 
