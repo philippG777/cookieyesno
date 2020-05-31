@@ -82,21 +82,21 @@ export default class CookieYesNo {
     onAccept(name, cb) {
         if((this.getSettings())[name] === true)
             cb();
-        else
-            this._acceptListeners.push({
-                name: name,
-                cb: cb
-            });
+
+        this._acceptListeners.push({
+            name: name,
+            cb: cb
+        });
     }
 
     onReject(name, cb) {
         if((this.getSettings())[name] === false)
             cb();
-        else
-            this._rejectListeners.push({
-                name: name,
-                cb: cb
-            });
+
+        this._rejectListeners.push({
+            name: name,
+            cb: cb
+        });
     }
 
     reviewSettings() {
