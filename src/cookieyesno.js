@@ -108,7 +108,7 @@ export default class CookieYesNo {
 
         // buttons
         text += '<button class="cyn-btn-accept-all">Accept all cookies</button>';
-        text += '<button class="cyn-btn-save">Allow selection</button>';
+        text += '<button class="cyn-btn-save">Accept selection</button>';
 
         text += '<table class="cyn-categories"><tbody>';
 
