@@ -119,11 +119,21 @@ export default class CookieYesNo {
         text += '</tbody></table>';
 
         // Cookie Policy link
-        text += '<p>For detailed information take a look at the <a href="' + this._config.cookiePolicy +
-            '">Cookie Policy</a>.</p>';
+        text += '<p>For detailed information take a look at the <a href="' + this._config.cookiePolicy.url +
+            '">' + this._config.cookiePolicy.text + '</a>.</p>';
 
         text += '<button class="cyn-btn-save">Save Settings</button>';
         text += '<button class="cyn-btn-accept-all">Accept all</button>';
+
+        // section for other links
+        text += '<div class="cyn-other-links" style="padding-top: 16px; padding-bottom: 10px">';
+
+        if(this._config.imprint != undefined)
+            text += '<a href="' + this._config.imprint.url + '">' + this._config.imprint.text + '</a> ';
+        if(this._config.privacyPolicy != undefined)
+            text += '<a href="' + this._config.privacyPolicy.url + '">' + this._config.privacyPolicy.text + '</a> ';
+
+        text += '</div>';
 
         el.innerHTML = text;
         el.style.display = 'none';
@@ -152,11 +162,16 @@ export default class CookieYesNo {
         style.padding = '16px';
         style.boxShadow = '0 0 24px #aaa';
         style.borderRadius = '8px';
+        style.overflowY = 'auto';
         
         if(window.innerWidth <= 768)    // mobile
-            style.right = style.left = style.bottom = '16px';
+            style.top = style.right = style.left = style.bottom = '16px';
         else        // desktop (large screen)
+        {
             style.right = style.bottom = '32px';
+            style.maxHeight = '80vh';
+        }
+            
 
         // table
         style = this.banner.getElementsByTagName('table')[0].style;

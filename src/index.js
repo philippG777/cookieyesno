@@ -5,8 +5,12 @@ import { log, showCookieSettings, clearCookie } from './helpers.js';
 
 
 const cyn = new CookieYesNo({
-	text: 'This website uses cookies. You can select below which cookies will be stored on your device.',
-    cookiePolicy: '#',
+    text: 'This website uses cookies. You can select below which cookies will be stored on your device.<br>\
+    You can review and revoke the consent at any time using the "Review Cookie Settings" link in the footer.',
+    cookiePolicy: {
+        url: '#',
+        text: 'Cookie Policy'
+    },
     categories: {                   // different categories of cookies
         required: {
             allowed: true,          // preselected
@@ -20,8 +24,33 @@ const cyn = new CookieYesNo({
         'Share buttons': {
             allowed: false,
             description: 'These cookies enable the share functionality.'
+        },
+        a: {
+            allowed: true,
+            description: 'a'
+        },
+        b: {
+            allowed: true,
+            description: 'a'
+        },
+        c: {
+            allowed: true,
+            description: 'a'
+        },
+        d: {
+            allowed: true,
+            description: 'a'
         }
-    }
+    },
+    imprint: {
+        url: '#',
+        text: 'Imprint'
+    },
+    privacyPolicy: {
+        url: '#',
+        text: 'Privacy Policy'
+    },
+    version: '2020-05-31'
 });
 
 
