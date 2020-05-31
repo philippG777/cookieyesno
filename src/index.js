@@ -6,7 +6,7 @@ import { log, showCookieSettings, clearCookie } from './helpers.js';
 
 const cyn = new CookieYesNo({
     text: 'This website uses cookies. You can select below which cookies will be stored on your device.<br>\
-    You can accept all of them using the "Accept all" button or accept a selection of them by using the <br>\
+    You can accept all of them using the "Accept all cookies" button or accept a selection of them by using the <br>\
     "Accept selection" button and the checkboxes to select which cookie groups will be allowed.<br>\
     You can review and revoke the consent at any time using the "Review Cookie Settings" link in the footer.',
     cookiePolicy: {
