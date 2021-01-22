@@ -1,0 +1,1 @@
+log('Analytics script loaded.');
