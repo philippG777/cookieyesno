@@ -5,8 +5,12 @@ var CookieYesNo = (function () {
     CookieYesNo | philippG777 | https://github.com/philippG777/cookieyesno | MIT License
     */
 
+    // TODO:
+    // Load blocked scripts
+    // reload on reject (by default true) none
+
     var CookieYesNo = function CookieYesNo(config) {
-        this.version = '1.0.4';
+        this.version = '1.1.0';
         this.cookie = { //  cookie handler
             set: function(data) {
                 var d = new Date();
@@ -29,10 +33,16 @@ var CookieYesNo = (function () {
 
         this._config = config;
 
-        // listeners
-        this._changeListeners = [];
-        this._acceptListeners = [];  
-        this._rejectListeners = [];      
+        // Create arrays for listeners if they do not already exist
+        var listenerTypes = ['onAccept', 'onReject', 'onChange'];
+        this._loopOverCategories(function (category) {
+            listenerTypes.forEach(function (listenerType) {
+                if(category[listenerType] === undefined)
+                {
+                    category[listenerType] = [];
+                }
+            });
+        });
 
         this.banner = this._createBanner();
         this._applyStyle();
@@ -49,7 +59,7 @@ var CookieYesNo = (function () {
             this.show();
         }
         else
-            { this._runAcceptRejectListeners(); }
+            { this._runListeners(); }
     };
 
     CookieYesNo.prototype._load = function _load () {
@@ -75,28 +85,21 @@ var CookieYesNo = (function () {
         else { return data['settings']; }
     };
 
-    CookieYesNo.prototype.onChange = function onChange (cb) {
-        this._changeListeners.push(cb);
+    CookieYesNo.prototype.onChange = function onChange (category, callback) {
+        this._config.categories[category].onChange.push(callback);
     };
 
-    CookieYesNo.prototype.onAccept = function onAccept (name, cb) {
-        if((this.getSettings())[name] === true)
-            { cb(); }
-
-        this._acceptListeners.push({
-            name: name,
-            cb: cb
-        });
+    CookieYesNo.prototype.onAccept = function onAccept (category, callback) {
+        if((this.getSettings())[category] === true)
+            { callback(); }
+        this._config.categories[category].onAccept.push(callback);
     };
 
-    CookieYesNo.prototype.onReject = function onReject (name, cb) {
-        if((this.getSettings())[name] === false)
-            { cb(); }
+    CookieYesNo.prototype.onReject = function onReject (category, callback) {
+        if((this.getSettings())[category] === false)
+            { callback(); }
 
-        this._rejectListeners.push({
-            name: name,
-            cb: cb
-        });
+        this._config.categories[category].onReject.push(callback);
     };
 
     CookieYesNo.prototype.reviewSettings = function reviewSettings () {
@@ -107,39 +110,39 @@ var CookieYesNo = (function () {
     CookieYesNo.prototype._createBanner = function _createBanner () {
         var el = document.createElement('div');
         el.className = 'cyn-banner';
-        var text = '<h3 style="font-size:28px;font-weight:bold;margin-top:16px;margin-bottom:20px">Cookie Settings</h3>';
-        text += '<p>' + this._config.text + '</p>';
+        var text = '<h3 style="font-size:28px;font-weight:bold;margin-top:16px;margin-bottom:20px">' +
+            this._config.title + '</h3>';
+        text += '<p>' + this._insertLinks(this._config.text.above) + '</p>';
 
 
         // buttons
-        text += '<button class="cyn-btn-accept-all">Accept all cookies</button>';
-        text += '<button class="cyn-btn-save">Accept selection</button>';
+        text += '<button class="cyn-btn-accept-all">' + this._config.acceptAllButtonText + '</button>';
+        text += '<button class="cyn-btn-save">' + this._config.acceptSelectionButtonText + '</button>';
 
         text += '<table class="cyn-categories"><tbody>';
 
-        for(var key in this._config.categories) {
-            var cat = this._config.categories[key];
-
-            text += '<tr><td style="font-weight:bold">' + key + '</td><td>' + cat.description + '</td><td>';
+        this._loopOverCategories(function (category, key) {
+            text += '<tr><td style="font-weight:bold">' + category.name + '</td><td>' + category.description + '</td><td>';
             text += '<input type="checkbox" value="' + key + '"'
-                 + ((cat.allowed)? ' checked' : '')
-                 + ((cat.changeable === true || cat.changeable === undefined)? '' : ' disabled') + '/>';
+                 + ((category.allowed)? ' checked' : '')
+                 + ((category.changeable === true || category.changeable === undefined)? '' : ' disabled') + '/>';
             text += '</td></tr>';
-        }
+        });
 
         text += '</tbody></table>';
 
         // Cookie Policy link
-        text += '<p>For detailed information take a look at the <a href="' + this._config.cookiePolicy.url +
-            '">' + this._config.cookiePolicy.text + '</a>.</p>';
+        text += '<p>' + this._insertLinks(this._config.text.below) + '</p>';
 
         // section for other links
         text += '<div class="cyn-other-links" style="padding-top:6px;padding-bottom:8px;font-size:12px">';
 
         if(this._config.imprint != undefined)
-            { text += '<a href="' + this._config.imprint.url + '">' + this._config.imprint.text + '</a> '; }
+            { text += this._createLink(this._config.imprint) + ' '; }
         if(this._config.privacyPolicy != undefined)
-            { text += '<a href="' + this._config.privacyPolicy.url + '">' + this._config.privacyPolicy.text + '</a> '; }
+            { text += this._createLink(this._config.privacyPolicy) + ' '; }
+        if(this._config.cookiePolicy != undefined)
+            { text += this._createLink(this._config.cookiePolicy); }
 
         text += '</div>';
 
@@ -155,8 +158,8 @@ var CookieYesNo = (function () {
         for(var i = 0; i < inputs.length; i++)
             { if(inputs[i].type == 'checkbox')
             {
-                inputs[i].checked = (settings[inputs[i].value.toLowerCase()] != undefined &&
-                    settings[inputs[i].value.toLowerCase()] == true)? true : false;
+                inputs[i].checked = (settings[inputs[i].value] != undefined &&
+                    settings[inputs[i].value] == true)? true : false;
             } }
     };
 
@@ -178,11 +181,15 @@ var CookieYesNo = (function () {
         style.overflowY = 'auto';
             
         if(window.innerWidth <= 768)// mobile
-            { style.top = style.right = style.left = style.bottom = '16px'; }
+        {
+            style.top = style.right = style.left = style.bottom = '16px';
+            style.maxWidth = '80%';
+        }
         else    // desktop (large screen)
         {
             style.right = style.bottom = '32px';
             style.maxHeight = '80vh';
+            style.maxWidth = '40%';
         }
                 
 
@@ -232,36 +239,96 @@ var CookieYesNo = (function () {
         var className = e.target.className;
         if(className.indexOf('cyn-btn-accept-all') != -1) {
             for(var category in this._config.categories)
-                { newSettings[category.toLowerCase()] = true; } // turn Analytics to analytics
+                { newSettings[category] = true; }
         } else if(className.indexOf('cyn-btn-save') != -1) {
             var inputs = this.banner.getElementsByTagName('input');
             for (var i  = 0; i < inputs.length; i++)
                 { if(inputs[i].type == 'checkbox')
-                    { newSettings[inputs[i].value.toLowerCase()] = inputs[i].checked; } }
+                    { newSettings[inputs[i].value] = inputs[i].checked; } }
         } else { return; }
 
         this.hide();
-
-        // run CBs
-        for(var i$1 = 0; i$1 < this._changeListeners.length; i$1++)
-            { this._changeListeners[i$1](newSettings); }
             
-        this._runAcceptRejectListeners(newSettings);
+        this._runListeners(newSettings);
 
         this._save(newSettings);
     };
 
-    CookieYesNo.prototype._runAcceptRejectListeners = function _runAcceptRejectListeners (settings) {
+    CookieYesNo.prototype._runListeners = function _runListeners (settings) {
+            var this$1 = this;
+
+        var initialPageLoadExecution = (settings === undefined)? true : false;
         if(settings === undefined)  // default parameter
             { settings = this.getSettings(); }
 
-        for(var i = 0; i < this._acceptListeners.length; i++)
-            { if(settings[this._acceptListeners[i].name] === true)
-                { this._acceptListeners[i].cb(); } }
+        this._loopOverCategories(function (category, key) {
+            category.onChange.forEach(function (listener) { return listener(settings[key]); });
 
-        for(var i$1 = 0; i$1 < this._rejectListeners.length; i$1++)
-            { if(settings[this._rejectListeners[i$1].name] === false)
-                { this._rejectListeners[i$1].cb(); } }
+            if(settings[key] === true)
+            {
+                category.onAccept.forEach(function (listener) { return listener(); });
+                this$1._activateScriptsOfCategory(key);
+            }
+            else
+            {
+                category.onReject.forEach(function (listener) {
+                    var reload = listener();
+                    /*
+                        When do we need to reload the page?
+                        -----------------------------------
+                        The page gets reloaded when the user rejects a cookie afterwards,
+                        and:
+                            * the callback routine thats executed before returns false
+                            * the reloadOnReject-option in the config is not set or
+                                is set to true
+                    */
+                    if(!initialPageLoadExecution && reload !== false &&
+                        (this$1._config.categories[key]['reloadOnReject'] === undefined
+                        || this$1._config.categories[key].reloadOnReject === true)
+                        )
+                    { location.reload(); }       // refresh page to stop script from running
+                });
+            }
+        });
+    };
+
+    CookieYesNo.prototype._loopOverCategories = function _loopOverCategories (callback) {
+        for(var key in this._config.categories)
+        {
+            callback(this._config.categories[key], key);
+        }
+    };
+
+    CookieYesNo.prototype._insertLinks = function _insertLinks (text) {
+        text = text.replace('COOKIE_POLICY', this._createLink(this._config.cookiePolicy));
+        text = text.replace('PRIVACY_POLICY', this._createLink(this._config.privacyPolicy));
+        return text.replace('IMPRINT', this._createLink(this._config.imprint));
+    };
+
+    CookieYesNo.prototype._createLink = function _createLink (link) {
+        return '<a href="' + link.url + '">' + link.text + '</a>'
+    };
+
+    CookieYesNo.prototype._activateScriptsOfCategory = function _activateScriptsOfCategory (category) {
+        var scripts = document.querySelectorAll('script[data-cyn-require=' + category + ']');
+        scripts.forEach(function (script) {
+            if (script.dataset['cynDone'] !== undefined)  // this script has already been activated
+            {
+                return;
+            }
+            script.dataset['cynDone'] = true;   // mark as done
+
+            var newScript = document.createElement('script');
+            if(script.dataset['cynSrc'] == undefined)   // inline script
+            {
+                newScript.innerText = script.innerText; // copy content
+            }
+            else// normal script
+            {
+                newScript.src = script.dataset['cynSrc'];   // copy src
+            }
+            document.body.appendChild(newScript);
+        });
     };
 
     CookieYesNo.prototype.show = function show () { this.banner.style.display = 'block'; };
