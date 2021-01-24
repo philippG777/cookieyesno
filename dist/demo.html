@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="cookieyesno.js"></script>
+</head>
+<body>
+    <script>
+        var cyn = new CookieYesNo({
+            categories: {
+                required: {
+                    name: 'Required cookies',
+                    description: 'These cookies are necessary for the website to function properly',
+                    accepted: true,
+                    changeable: false
+                },
+                analytics: {
+                    name: 'Web analytics',
+                    description: 'These cookies are used to analyze the user\'s behavior.'
+                }
+            }
+        });
+    </script>
+</body>
+</html>

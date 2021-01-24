@@ -10,6 +10,8 @@ var CookieYesNo = (function () {
     // reload on reject (by default true) none
 
     var CookieYesNo = function CookieYesNo(config) {
+        var this$1 = this;
+
         this.version = '1.1.0';
         this.cookie = { //  cookie handler
             set: function(data) {
@@ -32,6 +34,15 @@ var CookieYesNo = (function () {
         };
 
         this._config = config;
+
+        var setDefaultValue = function (key, defaultValue) {
+            if (this$1._config[key] === undefined)
+                { this$1._config[key] = defaultValue; }
+        };
+
+        setDefaultValue('title', 'Cookie Settings');
+        setDefaultValue('acceptAllButtonText', 'Accept all cookies');
+        setDefaultValue('acceptSelectionButtonText', 'Accept selected cookies');
 
         // Create arrays for listeners if they do not already exist
         var listenerTypes = ['onAccept', 'onReject', 'onChange'];
@@ -108,11 +119,20 @@ var CookieYesNo = (function () {
     };
 
     CookieYesNo.prototype._createBanner = function _createBanner () {
+        var textAbove = (this._config.text != undefined && this._config.text.above != undefined)?
+            this._config.text.above : 'This website uses cookies.\
+                You can choose below which cookies may be stored on your device. You can allow all cookies using\
+                the "Accept all cookies" button or accept a selection of cookies by using the\
+                "Accept selected cookies" button and the checkboxes to select cookie categories.\
+                You can review and revoke consent at any time using the "Review cookie settings" link in the footer.';
+
+        var textBelow = (this._config.text != undefined && this._config.text.below != undefined)?
+            this._config.text.below : '';
         var el = document.createElement('div');
         el.className = 'cyn-banner';
         var text = '<h3 style="font-size:28px;font-weight:bold;margin-top:16px;margin-bottom:20px">' +
             this._config.title + '</h3>';
-        text += '<p>' + this._insertLinks(this._config.text.above) + '</p>';
+        text += '<p>' + this._insertLinks(textAbove) + '</p>';
 
 
         // buttons
@@ -124,15 +144,14 @@ var CookieYesNo = (function () {
         this._loopOverCategories(function (category, key) {
             text += '<tr><td style="font-weight:bold">' + category.name + '</td><td>' + category.description + '</td><td>';
             text += '<input type="checkbox" value="' + key + '"'
-                 + ((category.allowed)? ' checked' : '')
+                 + ((category.accepted)? ' checked' : '')
                  + ((category.changeable === true || category.changeable === undefined)? '' : ' disabled') + '/>';
             text += '</td></tr>';
         });
 
         text += '</tbody></table>';
 
-        // Cookie Policy link
-        text += '<p>' + this._insertLinks(this._config.text.below) + '</p>';
+        text += '<p>' + this._insertLinks(textBelow) + '</p>';
 
         // section for other links
         text += '<div class="cyn-other-links" style="padding-top:6px;padding-bottom:8px;font-size:12px">';
@@ -266,8 +285,8 @@ var CookieYesNo = (function () {
 
             if(settings[key] === true)
             {
-                category.onAccept.forEach(function (listener) { return listener(); });
                 this$1._activateScriptsOfCategory(key);
+                category.onAccept.forEach(function (listener) { return listener(); });
             }
             else
             {
@@ -300,9 +319,14 @@ var CookieYesNo = (function () {
     };
 
     CookieYesNo.prototype._insertLinks = function _insertLinks (text) {
-        text = text.replace('COOKIE_POLICY', this._createLink(this._config.cookiePolicy));
-        text = text.replace('PRIVACY_POLICY', this._createLink(this._config.privacyPolicy));
-        return text.replace('IMPRINT', this._createLink(this._config.imprint));
+        if(this._config.cookiePolicy != undefined)
+            { text = text.replace('COOKIE_POLICY', this._createLink(this._config.cookiePolicy)); }
+        if(this._config.privacyPolicy != undefined)
+            { text = text.replace('PRIVACY_POLICY', this._createLink(this._config.privacyPolicy)); }
+        if(this._config.imprint != undefined)
+            { text =  text.replace('IMPRINT', this._createLink(this._config.imprint)); }
+
+        return text;
     };
 
     CookieYesNo.prototype._createLink = function _createLink (link) {

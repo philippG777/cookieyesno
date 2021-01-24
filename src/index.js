@@ -7,30 +7,22 @@ import { log, showCookieSettings, clearCookie } from './helpers.js';
 window.log = log;
 
 const cyn = new CookieYesNo({
-    title: 'Cookie Settings',
     text: {
-        above: 'This website uses cookies. You can select below which cookies will be stored on your device.<br>\
-                You can accept all of them using the "Accept all cookies" button or accept a selection of them by using the \
-                "Accept selection" button and the checkboxes to select which cookie groups will be allowed.\
-                You can review and revoke the consent at any time using the "Review Cookie Settings" link in the footer.',
         below: 'Take a look at the COOKIE_POLICY for more information.'
     },
     cookiePolicy: {
         url: '#',
         text: 'Cookie Policy'
     },
-    acceptAllButtonText: 'Accept all cookies',
-    acceptSelectionButtonText: 'Accept selected cookies',
     categories: {                   // different categories of cookies
         required: {
             name: 'Required cookies',
-            allowed: true,          // preselected
+            accepted: true,          // preselected
             description: 'These cookies are necessary for the website to function properly.',
             changeable: false       // user can not change this option
         },
         analytics: {
             name: 'Web Analytics',
-            allowed: false,         // not preselected
             description: 'These cookies are used to analyze the user\'s behavior.',
             onAccept: [
                 function() {
