@@ -135,4 +135,4 @@ The following classes are available:
 * `.cyn-btn-accept-all`: accept all button
 
 ---
-Based on https://github.com/rollup/rollup-starter-app and https://github.com/rollup/rollup-starter-lib
+Based on https://github.com/rollup/rollup-starter-app and https://github.com/rollup/rollup-starter-lib (both MIT License) Take a look at LICENSE_ROLLUP_STARTER_APP and LICENSE_ROLLUP_STARTER_LIB.
