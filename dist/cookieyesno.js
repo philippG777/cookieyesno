@@ -1,18 +1,16 @@
 var CookieYesNo = (function () {
     'use strict';
 
-    /*!
-    CookieYesNo | philippG777 | https://github.com/philippG777/cookieyesno | MIT License
+    /**
+     * @license
+     * CookieYesNo | https://github.com/philippG777/cookieyesno | BSD 4-Clause License (Modified)
+     * Copyright (c) 2021 Philipp Gretzl
     */
-
-    // TODO:
-    // Load blocked scripts
-    // reload on reject (by default true) none
 
     var CookieYesNo = function CookieYesNo(config) {
         var this$1 = this;
 
-        this.version = '1.1.0';
+        this.version = '1.1.1';
         this.cookie = { //  cookie handler
             set: function(data) {
                 var d = new Date();
@@ -32,6 +30,11 @@ var CookieYesNo = (function () {
                 document.cookie = '_cyn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;SameSite=Lax';
             }
         };
+            
+        // IE polyfill
+        if (window.NodeList && !NodeList.prototype.forEach) {
+            NodeList.prototype.forEach = Array.prototype.forEach;
+        }
 
         this._config = config;
 
@@ -120,11 +123,11 @@ var CookieYesNo = (function () {
 
     CookieYesNo.prototype._createBanner = function _createBanner () {
         var textAbove = (this._config.text != undefined && this._config.text.above != undefined)?
-            this._config.text.above : 'This website uses cookies.\
-                You can choose below which cookies may be stored on your device. You can allow all cookies using\
-                the "Accept all cookies" button or accept a selection of cookies by using the\
-                "Accept selected cookies" button and the checkboxes to select cookie categories.\
-                You can review and revoke consent at any time using the "Review cookie settings" link in the footer.';
+            this._config.text.above : 'This website uses cookies.' +
+                'You can choose below which cookies may be stored on your device. You can allow all cookies using' +
+                'the "Accept all cookies" button or accept a selection of cookies by using the' +
+                '"Accept selected cookies" button and the checkboxes to select cookie categories.' +
+                'You can review and revoke consent at any time using the "Review cookie settings" link in the footer.';
 
         var textBelow = (this._config.text != undefined && this._config.text.below != undefined)?
             this._config.text.below : '';
