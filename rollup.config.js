@@ -47,7 +47,11 @@ const productionBuildConfig = [
             resolve(), // so Rollup can find `ms`
             commonjs(), // so Rollup can convert `ms` to an ES module
             buble(),
-            uglify()
+            uglify({
+                output: {
+                    comments: "some"
+                }
+            })
         ]
     },
     {
