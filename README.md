@@ -1,5 +1,5 @@
 # CookieYesNo
-## An easy to use GDPR-complient cookie-banner
+## An easy to use GDPR-compliant cookie-banner
 ![Cookiebanner Screenshot](screenshot.png)
 
  	
